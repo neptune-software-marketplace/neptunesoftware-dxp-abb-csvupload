@@ -1,0 +1,8 @@
+var selectedItem = oEvent.getParameter("selectedItem");
+var context = selectedItem.getBindingContext();
+var selectedTable = context.getProperty("name");
+inpSelTables.setValue(selectedTable);
+
+var fieldDetails = dictionaryDetails.find(o => o.name === selectedTable).fields;
+modeloTableExisting.setData(fieldDetails);
+modeloTableExisting.refresh();

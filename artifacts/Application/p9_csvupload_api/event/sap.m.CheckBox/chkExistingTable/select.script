@@ -1,0 +1,23 @@
+wizstepLoadCSV.removeAllSubsequentSteps();
+wizstepExistingTable.removeAllSubsequentSteps();
+wizstepReviewSchema.removeAllSubsequentSteps();
+wizstepReviewData.removeAllSubsequentSteps();
+wizStepUploadData.removeAllSubsequentSteps();
+wizStepUploadData.removeAllSubsequentSteps();
+
+if (chkExistingTable.getSelected()) {
+    inpTableName.setValue("");
+    inpTableName.setEnabled(false);
+    lblTableName.setRequired(false);
+    wizstepLoadCSV.setNextStep(wizstepExistingTable);
+    wizstepExistingTable.setNextStep(wizstepReviewData);
+    wizStepUploadData.setNextStep(wizStepAPICreate);
+} else {
+    inpTableName.setEnabled(true);
+    lblTableName.setRequired(true);
+    wizstepLoadCSV.setNextStep(wizstepReviewSchema);
+    wizstepReviewSchema.setNextStep(wizstepReviewData);
+    wizStepUploadData.setNextStep(wizStepAPICreate);
+}
+
+wizstepReviewData.setNextStep(wizStepUploadData);

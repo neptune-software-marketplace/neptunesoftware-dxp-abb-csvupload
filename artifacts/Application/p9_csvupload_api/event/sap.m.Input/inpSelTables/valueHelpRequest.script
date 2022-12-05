@@ -1,0 +1,4 @@
+var binding = seldiaTables.getBinding("items");
+binding.filter([]);
+inpSelTables.setValue("");
+seldiaTables.open();

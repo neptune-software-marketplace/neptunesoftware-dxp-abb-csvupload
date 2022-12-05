@@ -1,0 +1,6 @@
+if (chkAPICreate.getSelected()) {
+    btnNextStep.setText("Next");
+    wizStepUploadData.setNextStep(wizStepAPICreate);
+} else {
+    btnNextStep.setText("Finish");
+}

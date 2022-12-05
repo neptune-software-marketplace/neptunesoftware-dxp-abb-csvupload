@@ -1,0 +1,242 @@
+switch (oWizard.getCurrentStep()) {
+
+    case "wizstepLoadCSV":
+
+        fileName = fuCSV.getValue();
+        tableName = inpTableName.getValue().toLowerCase().split(' ').join('');
+
+        if ((tableName === "") && (!chkExistingTable.getSelected())) {
+            sap.m.MessageToast.show("Please enter the name of the table to be created !");
+            break;
+        }
+
+        if (fileName === "") {
+            sap.m.MessageToast.show("Please select a file to upload !");
+            break;
+        }
+
+        oApp.setBusy(true);
+
+        var oParamTabName = new sap.ui.unified.FileUploaderParameter({
+            name: "tablename",
+            value: tableName
+        });
+        var oParamDataSep = new sap.ui.unified.FileUploaderParameter({
+            name: "separator",
+            value: selSeparator.getSelectedKey()
+        });
+        var oParamHasHeaderRow = new sap.ui.unified.FileUploaderParameter({
+            name: "hasheaderrow",
+            value: chkHeaderRow.getSelected()
+        });
+
+        fuCSV.addParameter(oParamTabName);
+        fuCSV.addParameter(oParamDataSep);
+        fuCSV.addParameter(oParamHasHeaderRow);
+        chkExistingTable.fireSelect();
+        fuCSV.upload();
+        break;
+
+    case "wizstepExistingTable":
+        tableName = inpSelTables.getValue();
+
+        if (tableName === "") {
+            sap.m.MessageToast.show("Please select a valid table from the list !");
+            break;
+        }
+
+        var fieldDetails = dictionaryDetails.find(o => o.name === tableName).fields;
+
+        if (fieldDetails.length !== tableHeader.length) {
+            sap.m.MessageToast.show("Selected table '" + tableName + "' does not have the same number of fields as the uploaded file !");
+            break;
+        } else {
+            tableHeaderMetadata = fieldDetails;
+
+        var headerArray = [];
+        tableHeaderMetadata.forEach(function (row) {
+            headerArray.push(row.fieldName);
+        });
+
+        tableHeader = headerArray;
+        
+        tabData.forEach(function (dataObj) {
+            replaceKeys(headerArray, dataObj);
+        });
+
+
+        }
+        if (chkDeleteAllRows.getSelected()) {
+            $.ajax({
+                type: "POST",
+                contentType: "application/json",
+                url: "/api/functions/Entity/Clear",
+                data: JSON.stringify({
+                    "table": tableName
+                }),
+                success: function (data) {
+                    sap.m.MessageToast.show("All data from table '" + tableName + "' has been successfully deleted !");
+                    buildDataTable();
+                    oWizard.nextStep();
+                },
+                error: function (result, status) {
+                    sap.m.MessageToast.show("Failed to delete data from table '" + tableName + "': " + result.responseJSON.status);
+                }
+            });
+        } else {
+            buildDataTable();
+            oWizard.nextStep();
+        }
+        break;
+    case "wizstepReviewSchema":
+        var fieldError = false;
+        $.each(modeloTableSchema.oData, function (i, field) {
+            if (field.colName === "id" || field.colName === "updatedAt" || field.colName === "createdAt" ||
+                field.colName === "updatedBy" || field.colName === "createdBy") {
+                sap.m.MessageToast.show("Fieldname is reserved/not allowed: " + field.colName);
+                fieldError = true;
+            }
+        });
+
+        // Check for duplicate.
+        var allFields = JSON.parse(JSON.stringify(modeloTableSchema.oData)).sort(function (a, b) {
+            if (a.colName > b.colName) {
+                return 1;
+            } else if (a.colName < b.colName) {
+                return -1;
+            } else {
+                return 0;
+            }
+        });
+
+        var duplicateFields = [];
+        $.each(allFields, function (i, field) {
+            if (allFields[i + 1] && field.colName === allFields[i + 1].colName) {
+                duplicateFields.push(field);
+            }
+        });
+
+        if (duplicateFields.length > 0) {
+            sap.m.MessageToast.show("You have duplicate field names: " + duplicateFields[0].colName);
+            fieldError = true;
+        }
+        // End check for duplicate
+
+        if (fieldError) break;
+
+        var payload = {
+            'name': tableName,
+            'fields': []
+        };
+
+        var fieldObjectArray = [];
+
+        $.each(modeloTableSchema.oData, function (i, field) {
+            var fieldObject = {};
+            fieldObject.fieldName = field.colName;
+            fieldObject.fieldType = field.dataType;
+            fieldObject.isUnique = (field.isUnique === true);
+            fieldObject.isNullable = (field.isNullable === true);
+            if (field.dataType === "decimal") {
+                if (field.precision !== "")
+                    fieldObject.precision = field.precision;
+                if (field.scale !== "")
+                    fieldObject.scale = field.scale;
+            }
+            fieldObjectArray.push(fieldObject);
+        });
+
+        payload.fields = fieldObjectArray;
+        tableHeaderMetadata = fieldObjectArray;
+
+        var headerArray = [];
+        tableHeaderMetadata.forEach(function (row) {
+            headerArray.push(row.fieldName);
+        });
+
+        tableHeader = headerArray;
+        
+        tabData.forEach(function (dataObj) {
+            replaceKeys(headerArray, dataObj);
+        });
+
+        $.ajax({
+            type: "POST",
+            contentType: "application/json",
+            url: "/api/functions/Dictionary/Save",
+            data: JSON.stringify(payload),
+            success: function (data) {
+                sap.m.MessageToast.show("Table '" + tableName + "' was created successfully !");
+                buildDataTable();
+                oWizard.nextStep();
+            },
+            error: function (result, status) {
+                sap.m.MessageToast.show("Error creating table : " + result.responseJSON.status);
+            }
+        });
+
+        break;
+    case "wizstepReviewData":
+        oWizard.nextStep();
+        var modData;
+        modData = JSON.parse(JSON.stringify(modeloTableData.oData));
+        modData.forEach(function (o) {
+            Object.keys(o).forEach(function (key) {
+                if (o[key] === 'null') {
+                    o[key] = null;
+                }
+            });
+        });
+
+        var uuidonlyfields = tableHeaderMetadata.filter(function (el) {
+            return el.fieldType == "uuid";
+        });
+
+        $.each(uuidonlyfields, function (key, value) {
+            modData.map(function (e) {
+                e[value.fieldName] = (e[value.fieldName] == "") || (e[value.fieldName] == "null") ? null : e[value.fieldName];
+            });
+        });
+
+        var intonlyfields = tableHeaderMetadata.filter(function (el) {
+            return el.fieldType == "integer" ||
+                el.fieldType == "bigint" ||
+                el.fieldType == "smallint"; //||
+            //el.fieldType == "decimal";
+        });
+
+        $.each(intonlyfields, function (key, value) {
+            modData.map(function (e) {
+                e[value.fieldName] = isNaN(parseInt(e[value.fieldName])) ? null : parseInt(e[value.fieldName]);
+            });
+        });
+
+        var chunked = chunk(modData, chunksize);
+        chunklength = chunked.length;
+
+
+        setProgress(0, modeloTableData.oData.length);
+        btnReset.setEnabled(false);
+        btnNextStep.setEnabled(false);
+        saveData(chunked, 0);
+
+        objstatUpload.setState("Warning");
+        objstatUpload.setText("Running");
+        btnNextStep.setText("Finish");
+        objhdrTable.setTitle(tableName);
+        objAttr.setText(fileName);
+        objhdrTable.setNumber(tabData.length);
+        break;
+    case "wizStepUploadData":
+        if (chkAPICreate.getSelected()) {
+            oWizard.nextStep();
+            btnNextStep.setText("Finish");
+            createRESTAPI();
+        } else {
+            resetAll();
+        }
+        break;
+    case "wizStepAPICreate":
+        resetAll();
+        break;
+}
