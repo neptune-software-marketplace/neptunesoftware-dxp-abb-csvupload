@@ -9,7 +9,7 @@
 	},
 	"name": "neptunesoftware-dxp-abb-csvupload",
 	"description": null,
-	"ver": "22.8.3.736",
+	"ver": "22.12.5.1755",
 	"enableCICD": true,
 	"apps": [
 		{

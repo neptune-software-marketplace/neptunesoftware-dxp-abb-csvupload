@@ -2281,6 +2281,18 @@
 			"fieldNo": 99999,
 			"data": [
 				{
+					"fieldNo": "51f95428-c8de-4234-85c7-1bd2197e434e",
+					"fieldName": "READ_ME",
+					"fieldParent": 99999,
+					"fieldType": "neptune.Script",
+					"script": "file://script/neptune.Script/READ_ME.script",
+					"customComponent": false,
+					"request": [],
+					"response": [],
+					"attributes": [],
+					"data": []
+				},
+				{
 					"fieldNo": "7caafb6e-08f5-4286-9e5e-c1d703152035",
 					"fieldName": "Dialogs",
 					"fieldParent": 99999,
@@ -2396,7 +2408,7 @@
 		}
 	],
 	"componentInterface": [],
-	"ver": "22.12.5.1850",
+	"ver": "22.12.5.1923",
 	"application": "p9_csvupload_api",
 	"title": "Planet 9 CSV uploader",
 	"description": "Planet 9 CSV uploader",
