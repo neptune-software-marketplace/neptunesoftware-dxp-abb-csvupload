@@ -9,7 +9,7 @@
 	},
 	"name": "neptunesoftware-dxp-abb-csvupload",
 	"description": null,
-	"ver": "22.12.5.1755",
+	"ver": "23.4.12.1529",
 	"enableCICD": true,
 	"apps": [
 		{
@@ -31,11 +31,29 @@
 	"reports": [],
 	"api_authentication": [],
 	"api_group": [],
-	"tile": [],
-	"category": [],
+	"tile": [
+		{
+			"id": "63acf741-3075-4e03-ad46-7ae7d5a06c11",
+			"description": null,
+			"name": "CSV Upload To Table"
+		}
+	],
+	"category": [
+		{
+			"id": "4888bae7-d6a2-4b48-8e2c-70ae8cccfb82",
+			"description": null,
+			"name": "CSV Upload"
+		}
+	],
 	"launchpad": [],
 	"certificates": [],
-	"role": [],
+	"role": [
+		{
+			"id": "62ffefa1-871b-42b4-bc18-1721eff7daea",
+			"name": "CSV Upload",
+			"description": null
+		}
+	],
 	"systems": [],
 	"doc": [],
 	"wf_notifications": [],
@@ -43,5 +61,9 @@
 	"script_scheduler": [],
 	"wf_definition": [],
 	"connector": [],
-	"events": []
+	"events": [],
+	"media_library": [],
+	"code_snippets": [],
+	"wf_determination": [],
+	"wf_taskaction": []
 }
