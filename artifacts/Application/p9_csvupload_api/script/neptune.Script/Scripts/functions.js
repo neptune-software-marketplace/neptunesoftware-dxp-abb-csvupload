@@ -365,3 +365,13 @@ function createAPIPayload() {
         "enableIDE": true
     };
 }
+
+function checkIfLaunchpad() {
+    const view = sap.n ? sap.n.currentView.getId() : "";
+    wizstepLoadCSV_var = sap.n ? view + "--wizstepLoadCSV" : "wizstepLoadCSV";
+    wizstepExistingTable_var = sap.n ? view + "--wizstepExistingTable" : "wizstepExistingTable";
+    wizstepReviewSchema_var = sap.n ? view + "--wizstepReviewSchema" : "wizstepReviewSchema";
+    wizstepReviewData_var = sap.n ? view + "--wizstepReviewData" : "wizstepReviewData";
+    wizStepUploadData_var = sap.n ? view + "--wizStepUploadData" : "wizStepUploadData";
+    wizStepAPICreate_var = sap.n ? view + "--wizStepAPICreate" : "wizStepAPICreate";
+}

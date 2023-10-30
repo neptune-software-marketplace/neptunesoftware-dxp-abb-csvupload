@@ -1,6 +1,8 @@
+checkIfLaunchpad();
+
 switch (oWizard.getCurrentStep()) {
 
-    case "wizstepLoadCSV":
+    case wizstepLoadCSV_var:
 
         fileName = fuCSV.getValue();
         tableName = inpTableName.getValue().toLowerCase().split(' ').join('');
@@ -37,7 +39,7 @@ switch (oWizard.getCurrentStep()) {
         fuCSV.upload();
         break;
 
-    case "wizstepExistingTable":
+    case wizstepExistingTable_var:
         tableName = inpSelTables.getValue();
 
         if (tableName === "") {
@@ -88,7 +90,7 @@ switch (oWizard.getCurrentStep()) {
             oWizard.nextStep();
         }
         break;
-    case "wizstepReviewSchema":
+    case wizstepReviewSchema_var:
         var fieldError = false;
         $.each(modeloTableSchema.oData, function (i, field) {
             if (field.colName === "id" || field.colName === "updatedAt" || field.colName === "createdAt" ||
@@ -176,7 +178,7 @@ switch (oWizard.getCurrentStep()) {
         });
 
         break;
-    case "wizstepReviewData":
+    case wizstepReviewData_var:
         oWizard.nextStep();
         var modData;
         modData = JSON.parse(JSON.stringify(modeloTableData.oData));
@@ -227,7 +229,7 @@ switch (oWizard.getCurrentStep()) {
         objAttr.setText(fileName);
         objhdrTable.setNumber(tabData.length);
         break;
-    case "wizStepUploadData":
+    case wizStepUploadData_var:
         if (chkAPICreate.getSelected()) {
             oWizard.nextStep();
             btnNextStep.setText("Finish");
@@ -236,7 +238,7 @@ switch (oWizard.getCurrentStep()) {
             resetAll();
         }
         break;
-    case "wizStepAPICreate":
+    case wizStepAPICreate_var:
         resetAll();
         break;
 }
