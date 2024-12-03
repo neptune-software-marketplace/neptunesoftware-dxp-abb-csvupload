@@ -35,7 +35,7 @@
 						{
 							"attribute": "title",
 							"grouping": "Properties",
-							"value": "Planet 9 CSV Uploader",
+							"value": "CSV Uploader",
 							"script": "",
 							"translation": []
 						},
